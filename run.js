@@ -40,13 +40,18 @@ Loader.prototype.startServer = function() {
 };
 
 Loader.prototype.startWatch = function() {
-    var fs = require("fs");
+    var watch = require("watch");
+
+    console.log("\n===== starting watch =====\n");
 
     for (var key in this.params.watch) {
         try{
-            fs.watch(this.params.watch[key], { recursive: true }, function (k, event, fileName) {
-                console.log(k + " changed / " + fileName + " | " + new Date());
-                this.server.sendMessage("all", JSON.stringify({fileName: fileName, type: k}));
+            var watchTmp = Object.create(watch);
+            watchTmp.watchTree(this.params.watch[key], function (type, name, curr, prev) {
+                if (typeof name == "object") { return true; };
+
+                console.log(type + " changed / " + name + " | " + new Date());
+                this.server.sendMessage("all", JSON.stringify({file: name, type: type}));
             }.bind(this, key));
         }catch(e){
             throw new Error(this.params.watch[key] + " no such file or directory")
