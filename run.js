@@ -48,19 +48,11 @@ Loader.prototype.startWatch = function() {
     for (var type in this.params.watch) {
         try{
             var watchTmp = Object.create(watch);
-            watchTmp.watchTree(this.params.watch[type], this.handleEvent.bind(this, type));
+            watchTmp.watchTree(this.params.watch[type], this.sendSignal.bind(this, type));
         }catch(e){
             throw new Error(this.params.watch[type] + " no such file or directory")
         }
     }
-};
-
-/**
- * @param  {String} type .. [js, css, html]
- * @param  {String} name .. fileName
- */
-Loader.prototype.handleEvent = function(type, name) {
-    this.sendSignal(type, name);
 };
 
 /**
