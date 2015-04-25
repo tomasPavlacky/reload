@@ -6,10 +6,11 @@ var Loader = function() {
         return;
     };
 
+    this.timeout = "";
     this.params = this.parseParams();
     this.server = this.startServer();
-    console.log(this.params);
 
+    console.log(this.params);
 
     this.startWatch();
 };
@@ -18,7 +19,7 @@ var Loader = function() {
  * @return {{}}
  */
 Loader.prototype.parseParams = function() {
-    var params = { basePath: process.argv[1], watch: {} };
+    var params = { watch: {} };
 
     if (process.argv.indexOf("--port") != -1) { params.port = process.argv[process.argv.indexOf("--port") + 1]; }
     if (process.argv.indexOf("-p") != -1) { params.port = process.argv[process.argv.indexOf("-p") + 1]; }
@@ -44,19 +45,37 @@ Loader.prototype.startWatch = function() {
 
     console.log("\n===== starting watch =====\n");
 
-    for (var key in this.params.watch) {
+    for (var type in this.params.watch) {
         try{
             var watchTmp = Object.create(watch);
-            watchTmp.watchTree(this.params.watch[key], function (type, name, curr, prev) {
-                if (typeof name == "object") { return true; };
-
-                console.log(type + " changed / " + name + " | " + new Date());
-                this.server.sendMessage("all", JSON.stringify({file: name, type: type}));
-            }.bind(this, key));
+            watchTmp.watchTree(this.params.watch[type], this.handleEvent.bind(this, type));
         }catch(e){
-            throw new Error(this.params.watch[key] + " no such file or directory")
+            throw new Error(this.params.watch[type] + " no such file or directory")
         }
     }
+};
+
+/**
+ * @param  {String} type .. [js, css, html]
+ * @param  {String} name .. fileName
+ */
+Loader.prototype.handleEvent = function(type, name) {
+    this.sendSignal(type, name);
+};
+
+/**
+ * @param  {String} type .. [js, css, html]
+ * @param  {String} name .. fileName
+ */
+Loader.prototype.sendSignal = function(type, name) {
+    clearTimeout(this.timeout);
+    // timeout because stupid fs.watch or watch emit signal twice
+    this.timeout = setTimeout(function(){
+        if (typeof name == "object") { return true; };
+
+        console.log(type + " changed / " + name + " | " + new Date());
+        this.server.sendMessage("all", JSON.stringify({file: name, type: type}));
+    }.bind(this), 100);
 };
 
 Loader.prototype.showUsage = function() {
