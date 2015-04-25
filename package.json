@@ -1,0 +1,30 @@
+{
+  "name": "reload",
+  "version": "1.0.0",
+  "description": "Automatic reload web browser after change css, js, html",
+  "main": "run.js",
+  "dependencies": {
+    "watch": "^0.16.0",
+    "websocketserver": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jonnybcz/reload.git"
+  },
+  "keywords": [
+    "live",
+    "reload",
+    "reload",
+    "page"
+  ],
+  "author": "Tomas Pavlacky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonnybcz/reload/issues"
+  },
+  "homepage": "https://github.com/jonnybcz/reload"
+}
